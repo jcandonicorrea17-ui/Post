@@ -164,12 +164,31 @@ button.heatmap-cell:focus-visible {
 }
 
 /* El brillo solo va en los días reales del calendario, no en el cuadrito de la leyenda.
-   Un anillo que se expande y se desvanece ("ping" de logro desbloqueado) en vez de solo
-   un box-shadow difuminado — así se distingue con claridad de un simple cuadro dorado. */
+   Anillo + estrella SIEMPRE visibles (no dependen de pillar el instante justo de una
+   animación) y, además, un anillo que se expande y se desvanece como extra en vivo. */
 .heatmap-grid .heatmap-level-4 {
   position: relative;
   z-index: 1;
-  box-shadow: 0 0 10px 2px rgba(245, 197, 24, 0.7);
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+  box-shadow: 0 0 14px 4px rgba(245, 197, 24, 0.8);
+}
+
+.heatmap-grid .heatmap-level-4::before {
+  content: '★';
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #0a0a0a;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  box-shadow: 0 0 6px 2px rgba(245, 197, 24, 0.8);
+  z-index: 2;
 }
 
 .heatmap-grid .heatmap-level-4::after {
