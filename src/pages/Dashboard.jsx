@@ -124,6 +124,15 @@ export default function Dashboard({ session, profile }) {
                 />
               ))}
             </div>
+
+            <a
+              href="https://tally.so/r/ja2XD4"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="feedback-link"
+            >
+              💬 ¿Tienes una idea? Cuéntanosla
+            </a>
           </div>
         )}
       </main>
