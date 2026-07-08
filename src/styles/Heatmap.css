@@ -163,31 +163,40 @@ button.heatmap-cell:focus-visible {
   font-weight: 700;
 }
 
-/* El brillo solo va en los días reales del calendario, no en el cuadrito de la leyenda. */
+/* El brillo solo va en los días reales del calendario, no en el cuadrito de la leyenda.
+   Un anillo que se expande y se desvanece ("ping" de logro desbloqueado) en vez de solo
+   un box-shadow difuminado — así se distingue con claridad de un simple cuadro dorado. */
 .heatmap-grid .heatmap-level-4 {
   position: relative;
   z-index: 1;
-  animation: heatmap-glow 1.8s ease-in-out infinite;
+  box-shadow: 0 0 10px 2px rgba(245, 197, 24, 0.7);
 }
 
-@keyframes heatmap-glow {
-  0%, 100% {
-    box-shadow:
-      0 0 10px 2px rgba(245, 197, 24, 0.75),
-      0 0 22px 6px rgba(245, 197, 24, 0.4);
+.heatmap-grid .heatmap-level-4::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  border: 2px solid var(--gold);
+  animation: heatmap-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes heatmap-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
   }
-  50% {
-    box-shadow:
-      0 0 18px 5px rgba(245, 197, 24, 1),
-      0 0 34px 11px rgba(245, 197, 24, 0.6);
+  70%,
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .heatmap-grid .heatmap-level-4 {
+  .heatmap-grid .heatmap-level-4::after {
     animation: none;
-    box-shadow:
-      0 0 14px 4px rgba(245, 197, 24, 0.9),
-      0 0 26px 8px rgba(245, 197, 24, 0.5);
+    opacity: 0.6;
   }
 }
