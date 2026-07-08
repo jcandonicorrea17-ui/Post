@@ -1,5 +1,13 @@
-const CACHE_NAME = 'racha-cache-v2'
-const OFFLINE_URLS = ['/', '/index.html', '/manifest.json', '/icon.svg']
+const CACHE_NAME = 'racha-cache-v3'
+const OFFLINE_URLS = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icon.svg',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/apple-touch-icon.png',
+]
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
