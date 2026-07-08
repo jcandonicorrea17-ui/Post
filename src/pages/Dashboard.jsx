@@ -83,6 +83,7 @@ export default function Dashboard({ session, profile }) {
       </header>
 
       <main className="dashboard-content">
+        <div key={view} className="view-transition">
         {view === 'today' && (
           <Today session={session} habits={habits} loading={loading} />
         )}
@@ -135,6 +136,7 @@ export default function Dashboard({ session, profile }) {
             </a>
           </div>
         )}
+        </div>
       </main>
 
       <nav className="dashboard-nav">

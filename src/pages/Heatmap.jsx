@@ -221,6 +221,7 @@ export default function Heatmap({ session, habits }) {
                   type="button"
                   key={dateStr}
                   className={`heatmap-cell heatmap-level-${level}`}
+                  style={{ animationDelay: `${index * 14}ms` }}
                   onMouseEnter={() => setActiveDate(day)}
                   onClick={() => {
                     playTickSound()

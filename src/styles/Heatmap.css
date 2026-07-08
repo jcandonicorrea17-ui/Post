@@ -95,6 +95,31 @@ button.heatmap-cell:focus-visible {
   outline-color: var(--gold);
 }
 
+/* Revelado progresivo: cada día del mes aparece uno tras otro (ver animationDelay
+   inline en Heatmap.jsx), no todos de golpe. Solo los días reales, no la leyenda. */
+.heatmap-grid button.heatmap-cell {
+  opacity: 0;
+  animation: heatmap-cell-in 0.4s ease forwards;
+}
+
+@keyframes heatmap-cell-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heatmap-grid button.heatmap-cell {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 .heatmap-detail {
   margin-top: 12px;
   min-height: 18px;
