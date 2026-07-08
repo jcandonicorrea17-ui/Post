@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { getCheckInsForDate, toggleCheckIn, setCheckInReflection } from '../lib/api'
 import { maybeShowDailyReminder } from '../lib/notifications'
 import TodayHabitCard from '../components/TodayHabitCard.jsx'
@@ -14,6 +14,14 @@ export default function Today({ session, habits, loading }) {
   const [checkInsLoaded, setCheckInsLoaded] = useState(false)
   const [error, setError] = useState('')
   const date = todayISODate()
+
+  // Los callbacks de abajo necesitan leer el checkIn más reciente de un hábito sin
+  // depender de `checkIns` en su lista de dependencias — si dependieran de `checkIns`,
+  // cambiarían de referencia en cada toggle y anularían el React.memo de cada card.
+  const checkInsRef = useRef(checkIns)
+  useEffect(() => {
+    checkInsRef.current = checkIns
+  }, [checkIns])
 
   const loadCheckIns = useCallback(async () => {
     try {
@@ -36,25 +44,32 @@ export default function Today({ session, habits, loading }) {
     }
   }, [loading, checkInsLoaded, habits.length, checkIns.length])
 
-  async function handleToggle(habitId) {
-    setError('')
-    const existing = checkIns.find((c) => c.habit_id === habitId)
-    try {
-      const result = await toggleCheckIn(habitId, date, existing?.id)
-      if (result) {
-        setCheckIns((prev) => [...prev, result])
-      } else {
-        setCheckIns((prev) => prev.filter((c) => c.habit_id !== habitId))
+  // Devuelve { success, checked } para que la card decida si celebrar — nunca antes
+  // de que Supabase confirme, así el "juice" nunca se adelanta a un rollback.
+  const handleToggle = useCallback(
+    async (habitId) => {
+      setError('')
+      const existing = checkInsRef.current.find((c) => c.habit_id === habitId)
+      try {
+        const result = await toggleCheckIn(habitId, date, existing?.id)
+        if (result) {
+          setCheckIns((prev) => [...prev, result])
+        } else {
+          setCheckIns((prev) => prev.filter((c) => c.habit_id !== habitId))
+        }
+        return { success: true, checked: Boolean(result) }
+      } catch (err) {
+        console.error('Error en check-in:', err)
+        setError(`No se pudo guardar el check-in: ${err.message}`)
+        return { success: false, checked: false }
       }
-    } catch (err) {
-      console.error('Error en check-in:', err)
-      setError(`No se pudo guardar el check-in: ${err.message}`)
-    }
-  }
+    },
+    [date]
+  )
 
-  async function handleReflection(habitId, emoji) {
+  const handleReflection = useCallback(async (habitId, emoji) => {
     setError('')
-    const existing = checkIns.find((c) => c.habit_id === habitId)
+    const existing = checkInsRef.current.find((c) => c.habit_id === habitId)
     if (!existing) return
     try {
       const updated = await setCheckInReflection(existing.id, emoji)
@@ -63,7 +78,7 @@ export default function Today({ session, habits, loading }) {
       console.error('Error guardando reflexión:', err)
       setError(`No se pudo guardar la reflexión: ${err.message}`)
     }
-  }
+  }, [])
 
   const completedCount = checkIns.length
   const totalCount = habits.length
@@ -96,18 +111,16 @@ export default function Today({ session, habits, loading }) {
       {error && <p className="error-message">{error}</p>}
 
       <div className="today-list">
-        {habits.map((habit) => {
-          const checkIn = checkIns.find((c) => c.habit_id === habit.id)
-          return (
-            <TodayHabitCard
-              key={habit.id}
-              habit={habit}
-              checkIn={checkIn}
-              onToggle={() => handleToggle(habit.id)}
-              onReflect={(emoji) => handleReflection(habit.id, emoji)}
-            />
-          )
-        })}
+        {habits.map((habit) => (
+          <TodayHabitCard
+            key={habit.id}
+            habitId={habit.id}
+            habit={habit}
+            checkIn={checkIns.find((c) => c.habit_id === habit.id)}
+            onToggle={handleToggle}
+            onReflect={handleReflection}
+          />
+        ))}
       </div>
     </div>
   )

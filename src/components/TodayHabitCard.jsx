@@ -1,22 +1,67 @@
-import { useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
+import { randomRewardMessage } from '../lib/rewardMessages'
 import '../styles/TodayHabitCard.css'
 
 const EMOJIS = ['😊', '😐', '😔', '🤩', '😤']
+const POP_DURATION_MS = 500
+const REWARD_DURATION_MS = 1500
 
-export default function TodayHabitCard({ habit, checkIn, onToggle, onReflect }) {
+function TodayHabitCard({ habitId, habit, checkIn, onToggle, onReflect }) {
   const [showPicker, setShowPicker] = useState(false)
+  const [popping, setPopping] = useState(false)
+  const [rewardMessage, setRewardMessage] = useState(null)
+  const [toggling, setToggling] = useState(false)
+  const popTimeoutRef = useRef(null)
+  const rewardTimeoutRef = useRef(null)
   const done = Boolean(checkIn)
+
+  useEffect(
+    () => () => {
+      clearTimeout(popTimeoutRef.current)
+      clearTimeout(rewardTimeoutRef.current)
+    },
+    []
+  )
+
+  async function handleClick() {
+    if (toggling) return
+    setToggling(true)
+    try {
+      const { success, checked } = await onToggle(habitId)
+
+      // Recompensa solo si Supabase confirmó Y el resultado fue "marcar como hecho".
+      // Desmarcar (checked === false) o un fallo (success === false) se queda silencioso.
+      if (success && checked) {
+        if (navigator.vibrate) navigator.vibrate(15)
+
+        setRewardMessage(randomRewardMessage())
+        clearTimeout(rewardTimeoutRef.current)
+        rewardTimeoutRef.current = setTimeout(() => setRewardMessage(null), REWARD_DURATION_MS)
+
+        setPopping(true)
+        clearTimeout(popTimeoutRef.current)
+        popTimeoutRef.current = setTimeout(() => setPopping(false), POP_DURATION_MS)
+      }
+    } finally {
+      setToggling(false)
+    }
+  }
 
   return (
     <div className="today-habit-card">
-      <button
-        type="button"
-        className={done ? 'check-circle done' : 'check-circle'}
-        onClick={onToggle}
-        aria-label={done ? 'Marcar como no hecho' : 'Marcar como hecho'}
-      >
-        {done ? '✓' : '○'}
-      </button>
+      <div className="today-habit-check-wrap">
+        <button
+          type="button"
+          className={done ? 'check-circle done' : 'check-circle'}
+          data-popping={popping || undefined}
+          onClick={handleClick}
+          disabled={toggling}
+          aria-label={done ? 'Marcar como no hecho' : 'Marcar como hecho'}
+        >
+          {done ? '✓' : '○'}
+        </button>
+        {rewardMessage && <span className="reward-badge">{rewardMessage}</span>}
+      </div>
 
       <div className="today-habit-info">
         <span className="today-habit-name">{habit.name}</span>
@@ -42,7 +87,7 @@ export default function TodayHabitCard({ habit, checkIn, onToggle, onReflect }) 
                   type="button"
                   className="reflection-option"
                   onClick={() => {
-                    onReflect(emoji)
+                    onReflect(habitId, emoji)
                     setShowPicker(false)
                   }}
                 >
@@ -56,3 +101,5 @@ export default function TodayHabitCard({ habit, checkIn, onToggle, onReflect }) 
     </div>
   )
 }
+
+export default memo(TodayHabitCard)

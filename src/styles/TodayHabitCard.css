@@ -8,6 +8,11 @@
   padding: 16px;
 }
 
+.today-habit-check-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .check-circle {
   flex-shrink: 0;
   width: 44px;
@@ -26,6 +31,75 @@
   border-color: var(--gold);
   color: var(--gold);
   background: rgba(245, 197, 24, 0.1);
+}
+
+.check-circle[data-popping] {
+  animation: check-pop 0.5s ease;
+}
+
+@keyframes check-pop {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(245, 197, 24, 0);
+  }
+  30% {
+    transform: scale(1.22);
+    box-shadow: 0 0 0 6px rgba(245, 197, 24, 0.3);
+  }
+  60% {
+    transform: scale(0.96);
+    box-shadow: 0 0 0 2px rgba(245, 197, 24, 0.15);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(245, 197, 24, 0);
+  }
+}
+
+.reward-badge {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--gold);
+  color: #0a0a0a;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  pointer-events: none;
+  animation: reward-badge-in 1.5s ease forwards;
+  z-index: 5;
+}
+
+@keyframes reward-badge-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px) scale(0.9);
+  }
+  15% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-4px) scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .check-circle[data-popping] {
+    animation: none;
+  }
+  .reward-badge {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 .today-habit-info {
