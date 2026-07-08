@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getCheckInsForDate, toggleCheckIn, setCheckInReflection } from '../lib/api'
 import { maybeShowDailyReminder } from '../lib/notifications'
+import { isHabitScheduledOn } from '../lib/dates'
 import TodayHabitCard from '../components/TodayHabitCard.jsx'
 import NotificationsBanner from '../components/NotificationsBanner.jsx'
 import '../styles/Today.css'
@@ -14,6 +15,17 @@ export default function Today({ session, habits, loading }) {
   const [checkInsLoaded, setCheckInsLoaded] = useState(false)
   const [error, setError] = useState('')
   const date = todayISODate()
+
+  // Solo los hábitos cuya frecuencia (diaria, o semanal con el día de hoy incluido)
+  // corresponde a hoy — antes se mostraban todos los hábitos todos los días.
+  const scheduledHabits = useMemo(
+    () => habits.filter((h) => isHabitScheduledOn(h, new Date())),
+    [habits]
+  )
+  const scheduledHabitIds = useMemo(
+    () => new Set(scheduledHabits.map((h) => h.id)),
+    [scheduledHabits]
+  )
 
   // Los callbacks de abajo necesitan leer el checkIn más reciente de un hábito sin
   // depender de `checkIns` en su lista de dependencias — si dependieran de `checkIns`,
@@ -40,9 +52,10 @@ export default function Today({ session, habits, loading }) {
 
   useEffect(() => {
     if (!loading && checkInsLoaded) {
-      maybeShowDailyReminder(habits.length - checkIns.length)
+      const completed = checkIns.filter((c) => scheduledHabitIds.has(c.habit_id)).length
+      maybeShowDailyReminder(scheduledHabits.length - completed)
     }
-  }, [loading, checkInsLoaded, habits.length, checkIns.length])
+  }, [loading, checkInsLoaded, scheduledHabits, scheduledHabitIds, checkIns])
 
   // Devuelve { success, checked } para que la card decida si celebrar — nunca antes
   // de que Supabase confirme, así el "juice" nunca se adelanta a un rollback.
@@ -80,8 +93,8 @@ export default function Today({ session, habits, loading }) {
     }
   }, [])
 
-  const completedCount = checkIns.length
-  const totalCount = habits.length
+  const completedCount = checkIns.filter((c) => scheduledHabitIds.has(c.habit_id)).length
+  const totalCount = scheduledHabits.length
 
   if (loading) {
     return <p className="dashboard-empty">Cargando...</p>
@@ -89,6 +102,10 @@ export default function Today({ session, habits, loading }) {
 
   if (habits.length === 0) {
     return <p className="dashboard-empty">Aún no tienes hábitos. Crea uno en &quot;Mis Hábitos&quot;.</p>
+  }
+
+  if (scheduledHabits.length === 0) {
+    return <p className="dashboard-empty">Hoy no tienes hábitos programados. 🎉</p>
   }
 
   return (
@@ -111,7 +128,7 @@ export default function Today({ session, habits, loading }) {
       {error && <p className="error-message">{error}</p>}
 
       <div className="today-list">
-        {habits.map((habit) => (
+        {scheduledHabits.map((habit) => (
           <TodayHabitCard
             key={habit.id}
             habitId={habit.id}

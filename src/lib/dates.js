@@ -20,3 +20,10 @@ export function daysAgo(n) {
   d.setDate(d.getDate() - n)
   return d
 }
+
+// ¿Este hábito toca hacerse en `date` según su frecuencia (diario, o el día de la
+// semana que corresponda si es semanal)?
+export function isHabitScheduledOn(habit, date) {
+  if (habit.frequency.type === 'daily') return true
+  return (habit.frequency.days || []).includes(mondayIndex(date.getDay()))
+}
