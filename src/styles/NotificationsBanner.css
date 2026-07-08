@@ -1,0 +1,19 @@
+.notifications-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.notifications-banner-btn {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  font-size: 13px;
+}

@@ -1,0 +1,111 @@
+.heatmap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.heatmap-header h2 {
+  font-size: 20px;
+}
+
+.heatmap-habit-select {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 8px 12px;
+  font-size: 13px;
+  max-width: 60%;
+}
+
+.heatmap-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.heatmap-month-nav button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  color: var(--gold);
+  transition: background var(--transition);
+}
+
+.heatmap-month-nav button:hover:not(:disabled) {
+  background: var(--border);
+}
+
+.heatmap-month-nav button:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.heatmap-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.heatmap-cell {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+
+.heatmap-blank {
+  background: transparent;
+  border: none;
+}
+
+.heatmap-level-0 {
+  background: var(--bg-elevated);
+}
+
+.heatmap-level-1 {
+  background: rgba(245, 197, 24, 0.25);
+  border-color: rgba(245, 197, 24, 0.25);
+  color: var(--text);
+}
+
+.heatmap-level-2 {
+  background: rgba(245, 197, 24, 0.5);
+  border-color: rgba(245, 197, 24, 0.5);
+  color: #0a0a0a;
+}
+
+.heatmap-level-3 {
+  background: rgba(245, 197, 24, 0.75);
+  border-color: rgba(245, 197, 24, 0.75);
+  color: #0a0a0a;
+}
+
+.heatmap-level-4 {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #0a0a0a;
+  font-weight: 700;
+}

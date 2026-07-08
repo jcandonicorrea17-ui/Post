@@ -1,0 +1,28 @@
+.habit-templates {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.habit-template-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 8px;
+  font-weight: 600;
+  font-size: 13px;
+  text-align: center;
+  transition: border-color var(--transition);
+}
+
+.habit-template-card:hover {
+  border-color: var(--gold);
+}
+
+.habit-template-icon {
+  font-size: 24px;
+}

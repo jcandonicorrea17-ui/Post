@@ -1,0 +1,183 @@
+.onboarding-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  gap: 8px;
+}
+
+.onboarding-progress {
+  width: 100%;
+  max-width: 380px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.onboarding-progress-fill {
+  height: 100%;
+  background: var(--gold);
+  transition: width var(--transition);
+}
+
+.onboarding-progress-label {
+  align-self: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+.onboarding-step {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: auto 0;
+}
+
+.onboarding-step-center {
+  text-align: center;
+  align-items: center;
+}
+
+.onboarding-brand {
+  color: var(--gold);
+  font-size: 40px;
+  font-weight: 800;
+}
+
+.onboarding-tagline {
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.onboarding-title {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.onboarding-subtitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.onboarding-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.onboarding-cta {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.onboarding-switch {
+  margin-top: 16px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-decoration: underline;
+  align-self: center;
+}
+
+.onboarding-switch:hover {
+  color: var(--gold);
+}
+
+.onboarding-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.onboarding-checkbox input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--gold);
+}
+
+.onboarding-info {
+  color: var(--gold);
+  font-size: 14px;
+}
+
+.onboarding-disclaimer {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.socials-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.social-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  font-weight: 600;
+  transition: border-color var(--transition);
+}
+
+.social-card:hover {
+  border-color: var(--gold);
+}
+
+.social-icon {
+  font-size: 20px;
+}
+
+.frequency-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.frequency-option {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-weight: 600;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.frequency-option.active {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.weekday-picker {
+  display: flex;
+  gap: 6px;
+}
+
+.weekday {
+  flex: 1;
+  aspect-ratio: 1;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  font-weight: 600;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.weekday.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(245, 197, 24, 0.1);
+}
