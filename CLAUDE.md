@@ -38,7 +38,7 @@ Toda la comunicación con Supabase pasa por `src/lib/api.js` (CRUD de perfil, h�
 
 ## PWA
 
-`public/service-worker.js` cachea assets estáticos con estrategia network-first + fallback a cache. `manifest.json` define el ícono (`public/icon.svg`) y el modo `standalone`.
+`public/service-worker.js` cachea assets estáticos con estrategia network-first + fallback a cache. `manifest.json` define los íconos (`public/icon-192.png`, `public/icon-512.png`, logo oficial de marca) y el modo `standalone`. Los íconos usan `purpose: "any"` (no `maskable`) a propósito, para que Android no le aplique el recorte adaptativo circular al logo.
 
 ## Notificaciones
 

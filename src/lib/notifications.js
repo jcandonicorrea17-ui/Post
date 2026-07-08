@@ -34,9 +34,9 @@ export async function maybeShowDailyReminder(pendingCount) {
   try {
     if ('serviceWorker' in navigator) {
       const registration = await navigator.serviceWorker.ready
-      await registration.showNotification(title, { body, icon: '/icon.svg' })
+      await registration.showNotification(title, { body, icon: '/icon-192.png' })
     } else {
-      new Notification(title, { body, icon: '/icon.svg' })
+      new Notification(title, { body, icon: '/icon-192.png' })
     }
     localStorage.setItem(STORAGE_KEY, todayKey())
   } catch (err) {

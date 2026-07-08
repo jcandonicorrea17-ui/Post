@@ -1,9 +1,9 @@
-const CACHE_NAME = 'racha-cache-v3'
+const CACHE_NAME = 'racha-cache-v4'
 const OFFLINE_URLS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon.svg',
+  '/favicon-32.png',
   '/icon-192.png',
   '/icon-512.png',
   '/apple-touch-icon.png',
