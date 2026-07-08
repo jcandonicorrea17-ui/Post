@@ -161,6 +161,10 @@ button.heatmap-cell:focus-visible {
   border-color: var(--gold);
   color: #0a0a0a;
   font-weight: 700;
+}
+
+/* El brillo solo va en los días reales del calendario, no en el cuadrito de la leyenda. */
+.heatmap-grid .heatmap-level-4 {
   animation: heatmap-glow 2.2s ease-in-out infinite;
 }
 
@@ -174,7 +178,7 @@ button.heatmap-cell:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .heatmap-level-4 {
+  .heatmap-grid .heatmap-level-4 {
     animation: none;
     box-shadow: 0 0 8px 1px rgba(245, 197, 24, 0.7);
   }
