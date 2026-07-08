@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { getCheckInsForRange } from '../lib/api'
 import { toISODate, startOfMonth, endOfMonth, mondayIndex } from '../lib/dates'
+import { playTickSound } from '../lib/sounds'
 import '../styles/Heatmap.css'
 
 const WEEKDAY_LABELS = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
@@ -221,7 +222,10 @@ export default function Heatmap({ session, habits }) {
                   key={dateStr}
                   className={`heatmap-cell heatmap-level-${level}`}
                   onMouseEnter={() => setActiveDate(day)}
-                  onClick={() => setActiveDate(day)}
+                  onClick={() => {
+                    playTickSound()
+                    setActiveDate(day)
+                  }}
                 >
                   <span className="heatmap-day-number">{day}</span>
                 </button>

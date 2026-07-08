@@ -1,5 +1,6 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import { randomRewardMessage } from '../lib/rewardMessages'
+import { playSuccessSound } from '../lib/sounds'
 import '../styles/TodayHabitCard.css'
 
 const EMOJIS = ['😊', '😐', '😔', '🤩', '😤']
@@ -33,6 +34,7 @@ function TodayHabitCard({ habitId, habit, checkIn, onToggle, onReflect }) {
       // Desmarcar (checked === false) o un fallo (success === false) se queda silencioso.
       if (success && checked) {
         if (navigator.vibrate) navigator.vibrate(15)
+        playSuccessSound()
 
         setRewardMessage(randomRewardMessage())
         clearTimeout(rewardTimeoutRef.current)
