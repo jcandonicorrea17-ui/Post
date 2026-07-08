@@ -165,21 +165,29 @@ button.heatmap-cell:focus-visible {
 
 /* El brillo solo va en los días reales del calendario, no en el cuadrito de la leyenda. */
 .heatmap-grid .heatmap-level-4 {
-  animation: heatmap-glow 2.2s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+  animation: heatmap-glow 1.8s ease-in-out infinite;
 }
 
 @keyframes heatmap-glow {
   0%, 100% {
-    box-shadow: 0 0 4px 0 rgba(245, 197, 24, 0.5);
+    box-shadow:
+      0 0 10px 2px rgba(245, 197, 24, 0.75),
+      0 0 22px 6px rgba(245, 197, 24, 0.4);
   }
   50% {
-    box-shadow: 0 0 12px 3px rgba(245, 197, 24, 0.9);
+    box-shadow:
+      0 0 18px 5px rgba(245, 197, 24, 1),
+      0 0 34px 11px rgba(245, 197, 24, 0.6);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .heatmap-grid .heatmap-level-4 {
     animation: none;
-    box-shadow: 0 0 8px 1px rgba(245, 197, 24, 0.7);
+    box-shadow:
+      0 0 14px 4px rgba(245, 197, 24, 0.9),
+      0 0 26px 8px rgba(245, 197, 24, 0.5);
   }
 }
