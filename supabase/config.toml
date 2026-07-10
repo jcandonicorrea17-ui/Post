@@ -1,0 +1,2 @@
+[functions.send-habit-reminders]
+verify_jwt = false

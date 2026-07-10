@@ -40,6 +40,18 @@ export async function markWelcomeTourSeen(userId) {
   if (error) throw error
 }
 
+// --- Push subscriptions ---
+
+// endpoint identifica de forma única al dispositivo/navegador suscrito: si ya
+// existe (mismo dispositivo suscribiéndose de nuevo), se actualiza en vez de
+// duplicar la fila.
+export async function upsertPushSubscription(userId, { endpoint, p256dh, auth: authKey }) {
+  const { error } = await supabase
+    .from('push_subscriptions')
+    .upsert({ user_id: userId, endpoint, p256dh, auth: authKey }, { onConflict: 'endpoint' })
+  if (error) throw error
+}
+
 // --- Habits ---
 
 export async function getHabits(userId) {

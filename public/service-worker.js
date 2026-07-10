@@ -1,4 +1,4 @@
-const CACHE_NAME = 'racha-cache-v4'
+const CACHE_NAME = 'racha-cache-v5'
 const OFFLINE_URLS = [
   '/',
   '/index.html',
@@ -25,14 +25,37 @@ self.addEventListener('activate', (event) => {
   self.clients.claim()
 })
 
+// Push real de servidor (enviado por la Edge Function send-habit-reminders).
+// Distinto del recordatorio local de notifications.js: este llega con la app
+// cerrada, mientras que el otro solo se muestra si el usuario ya la abrió.
+self.addEventListener('push', (event) => {
+  let data = {}
+  try {
+    data = event.data ? event.data.json() : {}
+  } catch {
+    data = { body: event.data ? event.data.text() : '' }
+  }
+
+  const title = data.title || 'Racha'
+  const options = {
+    body: data.body || '',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    data: { url: data.url || '/' },
+  }
+
+  event.waitUntil(self.registration.showNotification(title, options))
+})
+
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
+  const targetUrl = event.notification.data?.url || '/'
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
         if ('focus' in client) return client.focus()
       }
-      if (self.clients.openWindow) return self.clients.openWindow('/')
+      if (self.clients.openWindow) return self.clients.openWindow(targetUrl)
     })
   )
 })

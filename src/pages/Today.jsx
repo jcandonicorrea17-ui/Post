@@ -108,7 +108,7 @@ export default function Today({ session, habits, loading }) {
   return (
     <div className="today-view">
       <TimezoneDebug localDate={date} /> {/* TODO: quitar debug timezone */}
-      <NotificationsBanner />
+      <NotificationsBanner session={session} />
 
       <div className="today-header">
         <h2>Hoy</h2>

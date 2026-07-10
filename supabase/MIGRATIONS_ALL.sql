@@ -124,3 +124,90 @@ create trigger on_auth_user_created
 -- en el proyecto Supabase ya existente (tablas creadas sin esta columna).
 alter table profiles
   add column if not exists onboarding_completed boolean default false;
+
+-- Timezone IANA del dispositivo del usuario (ej. "Europe/Madrid"), detectado
+-- en el cliente con Intl.DateTimeFormat().resolvedOptions().timeZone.
+-- Permite que cálculos server-side (Edge Functions, cron) determinen el "día"
+-- local del usuario en vez de asumir UTC.
+alter table profiles add column timezone text;
+
+-- Controla si ya se le mostró al usuario el tour de bienvenida (3 pantallas,
+-- ver src/components/WelcomeTour.jsx) que se muestra una sola vez, encima de
+-- "Hoy", justo después de completar el onboarding obligatorio.
+--
+-- Distinta de profiles.onboarding_completed: esa marca el registro obligatorio
+-- (teléfono, redes, primer hábito) que bloquea el acceso al Dashboard; esta
+-- solo controla un overlay informativo que se puede saltar.
+alter table profiles
+  add column if not exists has_seen_welcome_tour boolean not null default false;
+
+-- Los usuarios que ya usaban la app antes de este cambio ya saben cómo funciona:
+-- no deben ver el tour retroactivamente, solo los que se registren de ahora en más.
+update profiles set has_seen_welcome_tour = true where onboarding_completed = true;
+
+-- Suscripciones Web Push (una fila por navegador/dispositivo suscrito).
+-- endpoint es único: si el mismo dispositivo se vuelve a suscribir (ej. tras
+-- reinstalar la PWA), se actualiza la fila existente en vez de duplicarla.
+create table push_subscriptions (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references profiles(id) on delete cascade not null,
+  endpoint text not null unique,
+  p256dh text not null,
+  auth text not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+create index push_subscriptions_user_id_idx on push_subscriptions(user_id);
+
+alter table push_subscriptions enable row level security;
+
+create policy "Push subscriptions are viewable by owner"
+  on push_subscriptions for select
+  using (auth.uid() = user_id);
+
+create policy "Push subscriptions are insertable by owner"
+  on push_subscriptions for insert
+  with check (auth.uid() = user_id);
+
+create policy "Push subscriptions are updatable by owner"
+  on push_subscriptions for update
+  using (auth.uid() = user_id);
+
+create policy "Push subscriptions are deletable by owner"
+  on push_subscriptions for delete
+  using (auth.uid() = user_id);
+
+-- Último día local (YYYY-MM-DD, según profiles.timezone) en que se envió el
+-- recordatorio push de hábitos pendientes. La Edge Function la usa para no
+-- mandar más de un aviso por usuario por día aunque el cron corra cada hora.
+alter table profiles add column if not exists last_push_reminder_date date;
+
+-- Antes de correr este archivo, guarda el secreto que autentica las llamadas
+-- del cron a la Edge Function (genera uno vos, ej. `openssl rand -hex 32`;
+-- debe ser EL MISMO valor que pongas como env var CRON_SECRET de la función):
+--
+--   select vault.create_secret('<tu-secreto-largo-random>', 'send_habit_reminders_cron_secret');
+--
+-- No lo pongas en este archivo ni en ningún commit: se guarda cifrado en
+-- Supabase Vault y esta migración solo lo referencia por nombre.
+
+create extension if not exists pg_cron with schema extensions;
+create extension if not exists pg_net with schema extensions;
+
+select cron.schedule(
+  'send-habit-reminders-hourly',
+  '0 * * * *', -- cada hora en punto; la Edge Function decide si es "tarde" en el timezone de cada usuario
+  $$
+  select net.http_post(
+    url := 'https://tbwrpobiykmecsgdswyi.supabase.co/functions/v1/send-habit-reminders',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'x-cron-secret', (
+        select decrypted_secret from vault.decrypted_secrets
+        where name = 'send_habit_reminders_cron_secret'
+      )
+    ),
+    body := '{}'::jsonb
+  );
+  $$
+);
