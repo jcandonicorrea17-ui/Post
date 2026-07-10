@@ -1,3 +1,5 @@
+import { toISODate } from './dates'
+
 const STORAGE_KEY = 'racha_reminder_last_shown'
 
 export function isNotificationSupported() {
@@ -15,7 +17,7 @@ export async function requestNotificationPermission() {
 }
 
 function todayKey() {
-  return new Date().toISOString().split('T')[0]
+  return toISODate(new Date())
 }
 
 // Recordatorio local: solo se muestra si la app está abierta (no es push real en segundo plano).

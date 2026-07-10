@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from './lib/supabase'
-import { getProfile } from './lib/api'
+import { getProfile, updateProfileTimezone } from './lib/api'
+import { getDeviceTimeZone } from './lib/dates'
 import Onboarding from './pages/Onboarding.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 
@@ -12,6 +13,18 @@ export default function App() {
     try {
       const data = await getProfile(userId)
       setProfile(data)
+
+      // Mantiene profiles.timezone al día con el timezone real del dispositivo
+      // (puede cambiar si el usuario viaja) para que cálculos server-side lo
+      // puedan usar en vez de asumir UTC.
+      const deviceTimeZone = getDeviceTimeZone()
+      if (data.timezone !== deviceTimeZone) {
+        try {
+          await updateProfileTimezone(userId, deviceTimeZone)
+        } catch (err) {
+          console.error('Error guardando timezone:', err.message)
+        }
+      }
     } catch (err) {
       console.error('Error cargando perfil:', err.message)
     }

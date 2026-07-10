@@ -1,20 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getCheckInsForDate, toggleCheckIn, setCheckInReflection } from '../lib/api'
 import { maybeShowDailyReminder } from '../lib/notifications'
-import { isHabitScheduledOn } from '../lib/dates'
+import { isHabitScheduledOn, toISODate } from '../lib/dates'
 import TodayHabitCard from '../components/TodayHabitCard.jsx'
 import NotificationsBanner from '../components/NotificationsBanner.jsx'
+import TimezoneDebug from '../components/TimezoneDebug.jsx' // TODO: quitar debug timezone
 import '../styles/Today.css'
-
-function todayISODate() {
-  return new Date().toISOString().split('T')[0]
-}
 
 export default function Today({ session, habits, loading }) {
   const [checkIns, setCheckIns] = useState([])
   const [checkInsLoaded, setCheckInsLoaded] = useState(false)
   const [error, setError] = useState('')
-  const date = todayISODate()
+  const date = toISODate(new Date())
 
   // Solo los hábitos cuya frecuencia (diaria, o semanal con el día de hoy incluido)
   // corresponde a hoy — antes se mostraban todos los hábitos todos los días.
@@ -110,6 +107,7 @@ export default function Today({ session, habits, loading }) {
 
   return (
     <div className="today-view">
+      <TimezoneDebug localDate={date} /> {/* TODO: quitar debug timezone */}
       <NotificationsBanner />
 
       <div className="today-header">

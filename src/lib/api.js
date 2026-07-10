@@ -23,6 +23,13 @@ export async function updateProfile(userId, updates) {
   return data
 }
 
+// Guarda el timezone IANA detectado en el dispositivo (ver lib/dates.js) para
+// que cálculos server-side puedan usar el mismo "día local" que el cliente.
+export async function updateProfileTimezone(userId, timezone) {
+  const { error } = await supabase.from('profiles').update({ timezone }).eq('id', userId)
+  if (error) throw error
+}
+
 // --- Habits ---
 
 export async function getHabits(userId) {
