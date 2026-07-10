@@ -1,0 +1,53 @@
+.bell-icon.off {
+  color: var(--text-secondary);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.bell-icon.on {
+  color: var(--gold);
+  fill: currentColor;
+  stroke: none;
+}
+
+.bell-icon.inactive {
+  color: var(--text-muted);
+  opacity: 0.5;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.bell-icon.animate {
+  animation: bell-shake 0.5s ease;
+}
+
+@keyframes bell-shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-15deg);
+  }
+  40% {
+    transform: rotate(12deg);
+  }
+  60% {
+    transform: rotate(-8deg);
+  }
+  80% {
+    transform: rotate(5deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bell-icon.animate {
+    animation: none;
+  }
+}

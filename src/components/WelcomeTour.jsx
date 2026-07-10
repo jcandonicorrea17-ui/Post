@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
+import BellIcon from './BellIcon.jsx'
 import '../styles/TodayHabitCard.css'
 import '../styles/Onboarding.css'
 import '../styles/WelcomeTour.css'
 
-const SLIDE_COUNT = 3
+const SLIDE_COUNT = 4
 const SWIPE_THRESHOLD_PX = 50
 
 const FAKE_HABITS = [
@@ -63,7 +64,7 @@ function WeekStreakDemo({ active }) {
   )
 }
 
-export default function WelcomeTour({ onFinish }) {
+export default function WelcomeTour({ notif, onFinish }) {
   const [index, setIndex] = useState(0)
   const dragStartX = useRef(null)
   const [dragDeltaPx, setDragDeltaPx] = useState(0)
@@ -148,6 +149,46 @@ export default function WelcomeTour({ onFinish }) {
             <WeekStreakDemo active={index === 2} />
           </div>
         </div>
+
+        <div className="tour-slide">
+          <p className="tour-message">Activa recordatorios para no perder tu racha 🔔</p>
+
+          <div className="tour-mockup tour-mockup-notifications">
+            <BellIcon on={notif.on} inactive={notif.inactive} animate={notif.animate} size={64} />
+
+            {notif.inactive && (
+              <p className="tour-notif-note">
+                {notif.iosNeedsInstall
+                  ? 'Para recibir recordatorios en iPhone, instala Racha en tu pantalla de inicio (Compartir → Añadir a pantalla de inicio) y actívalas después desde la campana.'
+                  : 'Las notificaciones no están disponibles en este navegador.'}
+              </p>
+            )}
+
+            {!notif.inactive && notif.subscribed && (
+              <p className="tour-notif-note">Ya tienes los recordatorios activados.</p>
+            )}
+
+            {notif.inactive || notif.subscribed ? (
+              <button type="button" className="btn-primary onboarding-cta" onClick={onFinish}>
+                Continuar
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="btn-primary onboarding-cta"
+                  onClick={notif.activate}
+                  disabled={notif.busy || notif.subscribed === null}
+                >
+                  {notif.busy ? 'Activando...' : 'Activar ahora'}
+                </button>
+                <button type="button" className="onboarding-switch" onClick={onFinish}>
+                  Ahora no
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="tour-footer">
@@ -156,9 +197,11 @@ export default function WelcomeTour({ onFinish }) {
             <span key={i} className={i === index ? 'tour-dot active' : 'tour-dot'} />
           ))}
         </div>
-        <button type="button" className="btn-primary tour-next" onClick={handleNext}>
-          {index === SLIDE_COUNT - 1 ? 'Empezar' : 'Siguiente'}
-        </button>
+        {index !== SLIDE_COUNT - 1 && (
+          <button type="button" className="btn-primary tour-next" onClick={handleNext}>
+            Siguiente
+          </button>
+        )}
       </div>
     </div>
   )

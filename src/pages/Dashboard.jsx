@@ -8,11 +8,14 @@ import {
 } from '../lib/api'
 import { toISODate, daysAgo } from '../lib/dates'
 import { calculateHabitScore, averageScore } from '../lib/habitScore'
+import { useNotificationBell } from '../hooks/useNotificationBell'
 import Today from './Today.jsx'
 import Heatmap from './Heatmap.jsx'
 import HabitCard from '../components/HabitCard.jsx'
 import CreateHabitModal from '../components/CreateHabitModal.jsx'
 import WelcomeTour from '../components/WelcomeTour.jsx'
+import NotificationBell from '../components/NotificationBell.jsx'
+import Toast from '../components/Toast.jsx'
 import '../styles/Dashboard.css'
 
 const SCORE_WINDOW_DAYS = 30
@@ -26,6 +29,10 @@ export default function Dashboard({ session, profile }) {
   // Solo se lee al montar: una vez cerrado (Siguiente en la 3ra pantalla o Saltar)
   // no debe reaparecer aunque el prop `profile` se refresque durante la sesión.
   const [showTour, setShowTour] = useState(() => !profile.has_seen_welcome_tour)
+  // Una sola instancia compartida por el ícono del header y la 4ª pantalla del
+  // welcome tour — si vivieran en hooks separados, activar desde el tour no
+  // se reflejaría en el ícono del header (quedaría "apagado" hasta recargar).
+  const notif = useNotificationBell(session.user.id)
 
   function handleTourFinish() {
     setShowTour(false)
@@ -90,14 +97,17 @@ export default function Dashboard({ session, profile }) {
 
   return (
     <div className="dashboard-screen">
-      {showTour && <WelcomeTour onFinish={handleTourFinish} />}
+      {showTour && <WelcomeTour notif={notif} onFinish={handleTourFinish} />}
 
       <header className="dashboard-header">
         <span className="dashboard-brand">Racha</span>
         {profile?.username && <span className="dashboard-username">{profile.username}</span>}
-        <button type="button" className="dashboard-logout" onClick={() => supabase.auth.signOut()}>
-          Salir
-        </button>
+        <div className="dashboard-header-actions">
+          <NotificationBell notif={notif} />
+          <button type="button" className="dashboard-logout" onClick={() => supabase.auth.signOut()}>
+            Salir
+          </button>
+        </div>
       </header>
 
       <main className="dashboard-content">
@@ -194,6 +204,8 @@ export default function Dashboard({ session, profile }) {
           }}
         />
       )}
+
+      {notif.toast && <Toast key={notif.toast.key} message={notif.toast.message} variant={notif.toast.variant} />}
     </div>
   )
 }

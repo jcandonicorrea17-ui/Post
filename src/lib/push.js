@@ -1,4 +1,4 @@
-import { upsertPushSubscription } from './api'
+import { upsertPushSubscription, deletePushSubscription } from './api'
 
 const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY
 
@@ -55,4 +55,26 @@ export async function subscribeToPush(userId) {
   })
 
   return subscription
+}
+
+// Suscripción push activa de este dispositivo, o null si nunca se suscribió
+// (o el navegador no soporta push). Es la fuente de verdad real de "¿está
+// activado?" — no basta con mirar el permiso del navegador, porque el
+// usuario puede tener el permiso concedido pero haber desactivado el toggle.
+export async function getCurrentPushSubscription() {
+  if (!isPushSupported()) return null
+  const registration = await navigator.serviceWorker.ready
+  return registration.pushManager.getSubscription()
+}
+
+// Revoca la suscripción en el navegador Y borra la fila en Supabase — sin
+// esto último, la Edge Function seguiría intentando (y fallando) mandarle
+// push a un endpoint que el propio dispositivo ya invalidó.
+export async function unsubscribeFromPush() {
+  const subscription = await getCurrentPushSubscription()
+  if (!subscription) return
+
+  const { endpoint } = subscription.toJSON()
+  await subscription.unsubscribe()
+  await deletePushSubscription(endpoint)
 }

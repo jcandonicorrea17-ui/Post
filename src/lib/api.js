@@ -52,6 +52,11 @@ export async function upsertPushSubscription(userId, { endpoint, p256dh, auth: a
   if (error) throw error
 }
 
+export async function deletePushSubscription(endpoint) {
+  const { error } = await supabase.from('push_subscriptions').delete().eq('endpoint', endpoint)
+  if (error) throw error
+}
+
 // --- Habits ---
 
 export async function getHabits(userId) {
