@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { getHabits, getCheckInsForRange, deleteHabit as deleteHabitApi } from '../lib/api'
+import {
+  getHabits,
+  getCheckInsForRange,
+  deleteHabit as deleteHabitApi,
+  markWelcomeTourSeen,
+} from '../lib/api'
 import { toISODate, daysAgo } from '../lib/dates'
 import { calculateHabitScore, averageScore } from '../lib/habitScore'
 import Today from './Today.jsx'
 import Heatmap from './Heatmap.jsx'
 import HabitCard from '../components/HabitCard.jsx'
 import CreateHabitModal from '../components/CreateHabitModal.jsx'
+import WelcomeTour from '../components/WelcomeTour.jsx'
 import '../styles/Dashboard.css'
 
 const SCORE_WINDOW_DAYS = 30
@@ -17,6 +23,16 @@ export default function Dashboard({ session, profile }) {
   const [loading, setLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [habitScores, setHabitScores] = useState({})
+  // Solo se lee al montar: una vez cerrado (Siguiente en la 3ra pantalla o Saltar)
+  // no debe reaparecer aunque el prop `profile` se refresque durante la sesión.
+  const [showTour, setShowTour] = useState(() => !profile.has_seen_welcome_tour)
+
+  function handleTourFinish() {
+    setShowTour(false)
+    markWelcomeTourSeen(session.user.id).catch((err) => {
+      console.error('Error guardando welcome tour:', err.message)
+    })
+  }
 
   const loadHabits = useCallback(async () => {
     setLoading(true)
@@ -74,6 +90,8 @@ export default function Dashboard({ session, profile }) {
 
   return (
     <div className="dashboard-screen">
+      {showTour && <WelcomeTour onFinish={handleTourFinish} />}
+
       <header className="dashboard-header">
         <span className="dashboard-brand">Racha</span>
         {profile?.username && <span className="dashboard-username">{profile.username}</span>}

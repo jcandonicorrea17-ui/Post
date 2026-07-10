@@ -30,6 +30,16 @@ export async function updateProfileTimezone(userId, timezone) {
   if (error) throw error
 }
 
+// Marca que el usuario ya vio el tour de bienvenida (WelcomeTour.jsx) para que
+// no vuelva a aparecer en futuras sesiones.
+export async function markWelcomeTourSeen(userId) {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ has_seen_welcome_tour: true })
+    .eq('id', userId)
+  if (error) throw error
+}
+
 // --- Habits ---
 
 export async function getHabits(userId) {
