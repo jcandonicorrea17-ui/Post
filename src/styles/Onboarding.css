@@ -181,3 +181,9 @@
   color: var(--gold);
   background: rgba(245, 197, 24, 0.1);
 }
+
+.weekday-hint {
+  margin-top: -4px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}

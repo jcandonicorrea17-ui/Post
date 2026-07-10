@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { createHabit, updateProfile } from '../../lib/api'
+import { formatWeeklyDaysHint } from '../../lib/dates'
 import HabitTemplates from '../HabitTemplates.jsx'
 
 const WEEKDAYS = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
@@ -98,6 +99,8 @@ export default function FirstHabitScreen({ session, onComplete }) {
     )
   }
 
+  const weeklyDaysHint = formatWeeklyDaysHint(selectedDays)
+
   return (
     <div className="onboarding-step">
       <h2 className="onboarding-title">Crea tu hábito</h2>
@@ -136,18 +139,25 @@ export default function FirstHabitScreen({ session, onComplete }) {
         </div>
 
         {frequencyType === 'weekly' && (
-          <div className="weekday-picker">
-            {WEEKDAYS.map((label, index) => (
-              <button
-                key={index}
-                type="button"
-                className={selectedDays.includes(index) ? 'weekday active' : 'weekday'}
-                onClick={() => toggleDay(index)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <>
+            <div className="weekday-picker">
+              {WEEKDAYS.map((label, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  className={selectedDays.includes(index) ? 'weekday active' : 'weekday'}
+                  onClick={() => toggleDay(index)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {weeklyDaysHint && (
+              <p className="weekday-hint">
+                Este hábito solo aparecerá en &quot;Hoy&quot; {weeklyDaysHint}.
+              </p>
+            )}
+          </>
         )}
 
         {error && <p className="error-message">{error}</p>}

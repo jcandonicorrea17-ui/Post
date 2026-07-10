@@ -34,6 +34,17 @@ export function mondayIndex(jsDay) {
   return (jsDay + 6) % 7
 }
 
+const WEEKDAY_FULL_NAMES = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
+
+// "los lunes, miércoles y viernes" a partir de índices 0=lunes…6=domingo (ver mondayIndex).
+// Devuelve null si no hay ningún día seleccionado.
+export function formatWeeklyDaysHint(dayIndexes) {
+  if (dayIndexes.length === 0) return null
+  const names = [...dayIndexes].sort((a, b) => a - b).map((i) => WEEKDAY_FULL_NAMES[i])
+  if (names.length === 1) return `los ${names[0]}`
+  return `los ${names.slice(0, -1).join(', ')} y ${names[names.length - 1]}`
+}
+
 export function daysAgo(n) {
   const d = new Date()
   d.setDate(d.getDate() - n)
