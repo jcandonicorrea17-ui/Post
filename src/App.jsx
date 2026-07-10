@@ -4,6 +4,7 @@ import { getProfile, updateProfileTimezone } from './lib/api'
 import { getDeviceTimeZone } from './lib/dates'
 import Onboarding from './pages/Onboarding.jsx'
 import Dashboard from './pages/Dashboard.jsx'
+import ResetPassword from './pages/ResetPassword.jsx'
 
 export default function App() {
   const [session, setSession] = useState(undefined)
@@ -49,6 +50,12 @@ export default function App() {
 
     return () => subscription.unsubscribe()
   }, [loadProfile])
+
+  // El link del email de recuperación redirige aquí (fuera del flujo normal de
+  // sesión/onboarding) sin importar si ya hay o no una sesión previa activa.
+  if (window.location.pathname === '/reset-password') {
+    return <ResetPassword />
+  }
 
   // Sesión aún no resuelta (undefined = cargando)
   if (session === undefined) {
